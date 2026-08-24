@@ -1,5 +1,5 @@
 /* ============================================================
-   data.js — Tablas de referencia extraídas de GURPS Lite (4ª ed.)
+   data.js — Tablas de referencia utilizadas por GLERPS (4ª ed.)
    Fuente: GURPS Lite (March 2020 Edition), Steve Jackson Games.
    ============================================================ */
 

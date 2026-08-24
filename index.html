@@ -3,168 +3,234 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>GURPS - Hoja de Personaje</title>
+<meta name="theme-color" content="#7b241c">
+<title>GLERPS — Hoja de Personaje</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="toolbar">
-  <button class="primary" onclick="newCharacter()">+ Nuevo</button>
-  <label>Cargar:</label>
-  <select id="charSelect" onchange="loadSelected()"><option value="">-- personajes guardados --</option></select>
-  <button onclick="saveCharacter()" class="gold">💾 Guardar</button>
-  <button onclick="deleteCharacter()">🗑 Borrar</button>
-  <button onclick="exportJSON()">⬇ Exportar JSON</button>
-  <button onclick="document.getElementById('importFile').click()">⬆ Importar JSON</button>
-  <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-  <button onclick="window.print()">🖨 Descargar / Imprimir PDF</button>
-  <span class="status" id="statusMsg"></span>
-</div>
-
-<div id="sheet">
-  <!-- HEADER -->
-  <div class="logo-row">
-    <div class="logo">GURPS</div>
-    <div class="fields">
-      <div class="field full"><label>Nombre</label><input id="f_name"></div>
-      <div class="field"><label>Jugador</label><input id="f_player"></div>
-      <div class="field"><label>Ht</label><input id="f_ht"></div>
-      <div class="field"><label>Wt</label><input id="f_wt"></div>
-      <div class="field"><label>Mod. Tamaño</label><input id="f_sm"></div>
-      <div class="field"><label>Edad</label><input id="f_age"></div>
-      <div class="field"><label>Pts iniciales (GM)</label><input id="f_startpoints"></div>
-      <div class="field"><label>Pts sin gastar</label><input id="f_unspent"></div>
-      <div class="field"><label>Puntos Totales</label><input id="f_pointtotal"></div>
-      <div class="field full"><label>Apariencia</label><input id="f_appearance"></div>
-    </div>
+<header class="toolbar">
+  <div class="brand-mini">GLERPS</div>
+  <div class="toolbar-group">
+    <button class="primary" onclick="newCharacter()">＋ Nuevo</button>
+    <label class="sr-only" for="charSelect">Personaje guardado</label>
+    <select id="charSelect" onchange="loadSelected()" title="Cargar personaje">
+      <option value="">— personajes guardados —</option>
+    </select>
+    <button onclick="saveCharacter()" class="gold">💾 Guardar</button>
+    <button onclick="duplicateCharacter()">⧉ Duplicar</button>
+    <button onclick="deleteCharacter()" class="danger-soft">🗑 Borrar</button>
   </div>
+  <div class="toolbar-group">
+    <button onclick="exportJSON()">⬇ Exportar</button>
+    <button onclick="document.getElementById('importFile').click()">⬆ Importar</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden onchange="importJSON(event)">
+    <button onclick="window.print()">🖨 Imprimir</button>
+    <button onclick="openDice()" title="Abrir dados">🎲 Dados</button>
+    <button onclick="openGuide()" title="Guía rápida">?</button>
+  </div>
+  <div class="toolbar-history">
+    <button id="undoBtn" onclick="undo()" disabled title="Deshacer (Ctrl/Cmd+Z)">↶</button>
+    <button id="redoBtn" onclick="redo()" disabled title="Rehacer (Ctrl/Cmd+Shift+Z)">↷</button>
+  </div>
+  <span class="status" id="statusMsg" aria-live="polite"></span>
+</header>
+
+<main id="sheet">
+  <section class="logo-row">
+    <div class="logo">
+      <span>GLERPS</span>
+      <small>CHARACTER SHEET</small>
+    </div>
+    <div class="fields">
+      <div class="field full"><label for="f_name">Nombre</label><input id="f_name" placeholder="Nombre del personaje" autocomplete="off"></div>
+      <div class="field"><label for="f_player">Jugador</label><input id="f_player" placeholder="Nombre del jugador"></div>
+      <div class="field"><label for="f_ht">Ht</label><input id="f_ht" placeholder="Ej. 180 cm"></div>
+      <div class="field"><label for="f_wt">Wt</label><input id="f_wt" placeholder="Ej. 75 kg"></div>
+      <div class="field"><label for="f_sm">Mod. Tamaño</label><input id="f_sm" type="number" step="1" placeholder="0"></div>
+      <div class="field"><label for="f_age">Edad</label><input id="f_age" type="number" min="0" placeholder="Edad"></div>
+      <div class="field"><label for="f_startpoints">Pts iniciales (GM)</label><input id="f_startpoints" type="number" step="1" placeholder="250"></div>
+      <div class="field"><label for="f_unspent">Pts sin gastar</label><input id="f_unspent" type="number" readonly class="calculated-input"></div>
+      <div class="field"><label for="f_pointtotal">Puntos gastados</label><input id="f_pointtotal" type="number" readonly class="calculated-input"></div>
+      <div class="field full"><label for="f_appearance">Apariencia</label><input id="f_appearance" placeholder="Descripción breve de la apariencia..."></div>
+    </div>
+  </section>
+
+  <section class="points-card" aria-label="Resumen de puntos">
+    <div><span>Presupuesto</span><strong id="pointsBudget">—</strong><small>puntos</small></div>
+    <div><span>Gastados</span><strong id="pointsSpent">0</strong><small>puntos</small></div>
+    <div><span>Disponibles</span><strong id="pointsRemaining">—</strong><small>puntos</small></div>
+    <div class="points-status" id="pointsStatus">Listo para crear</div>
+  </section>
 
   <div class="main-grid">
-    <!-- LEFT COLUMN -->
     <div>
-      <div class="panel">
-        <div class="attr-row">
-          <div class="attr-name">ST</div>
-          <input class="box-input" id="attr_st_base">
-          <div style="font-size:9px;text-align:center">HP</div>
-          <div class="attr-current"><input id="attr_hp_score" placeholder="pts"><input id="attr_hp_current" placeholder="actual"></div>
+      <section class="panel">
+        <div class="panel-title-row">
+          <div class="panel-title">Atributos</div>
+          <span class="hint">Los valores derivados se calculan automáticamente.</span>
         </div>
         <div class="attr-row">
-          <div class="attr-name">DX</div>
-          <input class="box-input" id="attr_dx_base">
-          <div style="font-size:9px;text-align:center">Will</div>
-          <input class="box-input" id="attr_will">
+          <div class="attr-name" title="Strength — Fuerza">ST <small>Strength</small></div>
+          <input class="box-input" id="attr_st_base" type="number" step="1" placeholder="10" aria-label="ST Strength">
+          <div class="derived-label" title="Hit Points — Puntos de vida">HP</div>
+          <div class="attr-current"><input id="attr_hp_score" placeholder="pts" readonly class="calculated-input" title="HP calculados"><input id="attr_hp_current" placeholder="actual" type="number" title="HP actuales"></div>
         </div>
         <div class="attr-row">
-          <div class="attr-name">IQ</div>
-          <input class="box-input" id="attr_iq_base">
-          <div style="font-size:9px;text-align:center">Per</div>
-          <input class="box-input" id="attr_per">
+          <div class="attr-name" title="Dexterity — Destreza">DX <small>Dexterity</small></div>
+          <input class="box-input" id="attr_dx_base" type="number" step="1" placeholder="10" aria-label="DX Dexterity">
+          <div class="derived-label" title="Will — Voluntad">Will</div>
+          <input class="box-input calculated-input" id="attr_will" readonly placeholder="IQ">
         </div>
         <div class="attr-row">
-          <div class="attr-name">HT</div>
-          <input class="box-input" id="attr_ht_base">
-          <div style="font-size:9px;text-align:center">FP</div>
-          <div class="attr-current"><input id="attr_fp_score" placeholder="pts"><input id="attr_fp_current" placeholder="actual"></div>
+          <div class="attr-name" title="Intelligence — Inteligencia">IQ <small>Intelligence</small></div>
+          <input class="box-input" id="attr_iq_base" type="number" step="1" placeholder="10" aria-label="IQ Intelligence">
+          <div class="derived-label" title="Perception — Percepción">Per</div>
+          <input class="box-input calculated-input" id="attr_per" readonly placeholder="IQ">
         </div>
-      </div>
+        <div class="attr-row">
+          <div class="attr-name" title="Health — Salud">HT <small>Health</small></div>
+          <input class="box-input" id="attr_ht_base" type="number" step="1" placeholder="10" aria-label="HT Health">
+          <div class="derived-label" title="Fatigue Points — Puntos de fatiga">FP</div>
+          <div class="attr-current"><input id="attr_fp_score" placeholder="pts" readonly class="calculated-input"><input id="attr_fp_current" placeholder="actual" type="number" title="FP actuales"></div>
+        </div>
+      </section>
 
-      <div class="panel">
-        <button type="button" class="add-row-btn" onclick="calcPoints()">🧮 Calcular puntos gastados (atributos + ventajas + desventajas + habilidades)</button>
-        <div id="pointsBreakdown" style="font-size:11px;margin-top:6px;line-height:1.5;"></div>
-      </div>
+      <section class="panel">
+        <div class="panel-title-row"><div class="panel-title">Puntos</div><button class="text-btn" onclick="calcPoints()">Recalcular</button></div>
+        <div id="pointsBreakdown" class="breakdown"></div>
+      </section>
 
-      <div class="panel">
-        <button type="button" class="add-row-btn" style="margin-bottom:6px" onclick="calcSecondary()">⚙ Calcular HP/Will/Per/FP/BL/Daño/Velocidad/Encumbrance (reglas GURPS Lite)</button>
+      <section class="panel">
+        <div class="panel-title-row">
+          <div class="panel-title">Características secundarias</div>
+          <button class="text-btn" onclick="calcSecondary(true)">Recalcular</button>
+        </div>
         <div class="basic-line">
-          <div class="field"><label>Basic Lift (o ×BL/8)</label><input class="small-input" id="f_basiclift"></div>
-          <div class="field"><label>Damage Thr</label><input class="small-input" id="f_dmgthr"></div>
-          <div class="field"><label>Sw</label><input class="small-input" id="f_dmgsw"></div>
-          <div class="field"><label>Basic Speed</label><input class="small-input" id="f_basicspeed"></div>
-          <div class="field"><label>Basic Move</label><input class="small-input" id="f_basicmove"></div>
+          <div class="field"><label for="f_basiclift">Basic Lift</label><input class="small-input calculated-input" id="f_basiclift" readonly></div>
+          <div class="field"><label for="f_dmgthr">Damage Thr</label><input class="small-input calculated-input" id="f_dmgthr" readonly></div>
+          <div class="field"><label for="f_dmgsw">Damage Sw</label><input class="small-input calculated-input" id="f_dmgsw" readonly></div>
+          <div class="field"><label for="f_basicspeed">Basic Speed</label><input class="small-input calculated-input" id="f_basicspeed" readonly></div>
+          <div class="field"><label for="f_basicmove">Basic Move</label><input class="small-input calculated-input" id="f_basicmove" readonly></div>
         </div>
-        <table class="enc-table">
-          <tr><th>Encumbrance</th><th>Move</th><th>Dodge</th></tr>
-          <tr><td>None (0) = BL</td><td>BM ×1 <input class="small-input" style="width:40px" id="enc_none_move"></td><td>Dodge <input class="small-input" style="width:40px" id="enc_none_dodge"></td></tr>
-          <tr><td>Light (1) = 2×BL</td><td>BM ×0.8 <input class="small-input" style="width:40px" id="enc_light_move"></td><td>Dodge -1</td></tr>
-          <tr><td>Medium (2) = 3×BL</td><td>BM ×0.6 <input class="small-input" style="width:40px" id="enc_med_move"></td><td>Dodge -2</td></tr>
-          <tr><td>Heavy (3) = 6×BL</td><td>BM ×0.4 <input class="small-input" style="width:40px" id="enc_heavy_move"></td><td>Dodge -3</td></tr>
-          <tr><td>X-Heavy (4) = 10×BL</td><td>BM ×0.2 <input class="small-input" style="width:40px" id="enc_xheavy_move"></td><td>Dodge -4</td></tr>
-        </table>
-      </div>
+        <div class="table-scroll">
+          <table class="enc-table">
+            <thead><tr><th>Encumbrance</th><th>Move</th><th>Dodge</th></tr></thead>
+            <tbody>
+              <tr><td>None (0) = BL</td><td>BM ×1 <input class="small-input" id="enc_none_move" readonly></td><td>Dodge <input class="small-input" id="enc_none_dodge" readonly></td></tr>
+              <tr><td>Light (1) = 2×BL</td><td>BM ×0.8 <input class="small-input" id="enc_light_move" readonly></td><td>Dodge -1</td></tr>
+              <tr><td>Medium (2) = 3×BL</td><td>BM ×0.6 <input class="small-input" id="enc_med_move" readonly></td><td>Dodge -2</td></tr>
+              <tr><td>Heavy (3) = 6×BL</td><td>BM ×0.4 <input class="small-input" id="enc_heavy_move" readonly></td><td>Dodge -3</td></tr>
+              <tr><td>X-Heavy (4) = 10×BL</td><td>BM ×0.2 <input class="small-input" id="enc_xheavy_move" readonly></td><td>Dodge -4</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-      <div class="panel">
-        <div class="panel-title">Advantages and Perks</div>
-        <div class="table-scroll"><table><tbody id="tbl_advantages"></tbody></table></div>
-        <button class="add-row-btn" onclick="addRow('tbl_advantages',TABLE_COLS.tbl_advantages)">+ agregar fila</button>
-      </div>
+      <section class="panel">
+        <div class="panel-title-row"><div class="panel-title">Advantages & Perks</div><button class="text-btn" onclick="addRow('tbl_advantages',TABLE_COLS.tbl_advantages)">＋ Agregar</button></div>
+        <div class="table-scroll"><table><thead><tr><th>Tipo</th><th>Descripción</th><th>Pts</th><th></th></tr></thead><tbody id="tbl_advantages"></tbody></table></div>
+      </section>
 
-      <div class="panel">
-        <div class="panel-title">Disadvantages and Quirks</div>
-        <div class="table-scroll"><table><tbody id="tbl_disadvantages"></tbody></table></div>
-        <button class="add-row-btn" onclick="addRow('tbl_disadvantages',TABLE_COLS.tbl_disadvantages)">+ agregar fila</button>
-      </div>
+      <section class="panel">
+        <div class="panel-title-row"><div class="panel-title">Disadvantages & Quirks</div><button class="text-btn" onclick="addRow('tbl_disadvantages',TABLE_COLS.tbl_disadvantages)">＋ Agregar</button></div>
+        <div class="table-scroll"><table><thead><tr><th>Tipo</th><th>Descripción</th><th>Pts</th><th></th></tr></thead><tbody id="tbl_disadvantages"></tbody></table></div>
+      </section>
     </div>
 
-    <!-- RIGHT COLUMN -->
     <div>
-      <div class="panel">
-        <div class="panel-title">Languages</div>
+      <section class="panel">
+        <div class="panel-title-row"><div class="panel-title">Languages</div><button class="text-btn" onclick="addRow('tbl_languages',TABLE_COLS.tbl_languages)">＋ Agregar</button></div>
         <div class="table-scroll"><table>
-          <tr><th>Idioma</th><th style="width:70px">Hablado</th><th style="width:70px">Escrito</th></tr>
+          <thead><tr><th>Idioma</th><th>Hablado</th><th>Escrito</th><th></th></tr></thead>
           <tbody id="tbl_languages"></tbody>
         </table></div>
-        <button class="add-row-btn" onclick="addRow('tbl_languages',TABLE_COLS.tbl_languages)">+ agregar idioma</button>
-      </div>
+      </section>
 
-      <div class="panel">
+      <section class="panel">
         <div class="panel-title">DR / TL / Cultural Familiarities</div>
-        <div class="field"><label>DR</label><input class="small-input" id="f_dr"></div>
-        <div class="field"><label>TL</label><input class="small-input" id="f_tl"></div>
-        <div class="field"><label>Cultural Familiarities</label><input class="small-input" id="f_cultural"></div>
-      </div>
-
-      <div class="panel">
-        <div class="basic-line" style="grid-template-columns:1fr 1fr;">
-          <div class="field"><label>Parry</label><input class="small-input" id="f_parry"></div>
-          <div class="field"><label>Block</label><input class="small-input" id="f_block"></div>
+        <div class="compact-fields">
+          <div class="field"><label for="f_dr">DR</label><input class="small-input" id="f_dr" type="number" placeholder="0"></div>
+          <div class="field"><label for="f_tl">TL</label><input class="small-input" id="f_tl" placeholder="—"></div>
+          <div class="field"><label for="f_cultural">Cultural Familiarities</label><input class="small-input" id="f_cultural" placeholder="Ej. Western"></div>
         </div>
-        <div class="panel-title" style="margin-top:6px;">Reaction Modifiers</div>
-        <div class="reaction-field"><label>Appearance</label><input id="f_react_appearance"></div>
-        <div class="reaction-field"><label>Status</label><input id="f_react_status"></div>
-        <div class="reaction-field"><label>Reputation</label><input id="f_react_reputation"></div>
-      </div>
+      </section>
 
-      <div class="panel">
-        <div class="panel-title">Skills</div>
+      <section class="panel">
+        <div class="compact-fields">
+          <div class="field"><label for="f_parry">Parry</label><input class="small-input" id="f_parry" placeholder="—"></div>
+          <div class="field"><label for="f_block">Block</label><input class="small-input" id="f_block" placeholder="—"></div>
+        </div>
+        <div class="panel-title" style="margin-top:8px">Reaction Modifiers</div>
+        <div class="reaction-field"><label for="f_react_appearance">Appearance</label><input id="f_react_appearance" placeholder="+0"></div>
+        <div class="reaction-field"><label for="f_react_status">Status</label><input id="f_react_status" placeholder="+0"></div>
+        <div class="reaction-field"><label for="f_react_reputation">Reputation</label><input id="f_react_reputation" placeholder="+0"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title-row"><div class="panel-title">Skills</div><button class="text-btn" onclick="addRow('tbl_skills',TABLE_COLS.tbl_skills)">＋ Agregar</button></div>
         <div class="table-scroll"><table>
-          <tr><th>Name</th><th style="width:46px">Level</th><th style="width:42px">Rel.</th><th style="width:62px">Dif.</th><th style="width:40px">Pts</th></tr>
+          <thead><tr><th>Tipo</th><th>Habilidad</th><th>Nivel</th><th>Rel.</th><th>Dif.</th><th>Pts</th><th></th></tr></thead>
           <tbody id="tbl_skills"></tbody>
         </table></div>
-        <button class="add-row-btn" onclick="addRow('tbl_skills',TABLE_COLS.tbl_skills)">+ agregar habilidad</button>
-        <button class="add-row-btn" onclick="calcSkillPoints()">🧮 Calcular puntos de habilidades</button>
-        <div style="font-size:10px;color:#666;margin-top:4px;">
-          "Rel." es el nivel relativo al atributo controlador (ej: IQ+1 → cargá <b>1</b>). "Dif." es Fácil/Media/Difícil según la habilidad (p.13 GURPS Lite).
-        </div>
-      </div>
+        <button class="add-row-btn secondary-action" onclick="calcSkillPoints()">🧮 Calcular puntos de habilidades</button>
+        <p class="micro-help"><b>Rel.</b> es el nivel relativo al atributo controlador. Ej.: IQ+1 → <b>1</b>. <b>Dif.</b>: Fácil / Media / Difícil.</p>
+      </section>
 
-      <div class="panel">
-        <div class="panel-title">Equipment</div>
+      <section class="panel">
+        <div class="panel-title-row"><div class="panel-title">Equipment</div><button class="text-btn" onclick="addRow('tbl_equipment',TABLE_COLS.tbl_equipment)">＋ Agregar</button></div>
         <div class="table-scroll"><table>
-          <tr><th>Ítem</th><th style="width:70px">Costo</th><th style="width:60px">Peso</th><th>Notas</th></tr>
+          <thead><tr><th>Ítem</th><th>Costo</th><th>Peso</th><th>Notas</th><th></th></tr></thead>
           <tbody id="tbl_equipment"></tbody>
         </table></div>
-        <button class="add-row-btn" onclick="addRow('tbl_equipment',TABLE_COLS.tbl_equipment)">+ agregar ítem manual</button>
-      </div>
+      </section>
     </div>
   </div>
 
-  <!-- REFERENCIA DE ARMAS Y ARMADURAS -->
-  <div class="panel ref-panel">
-    <div class="panel-title">Referencia: Armas y Armaduras (GURPS Lite)</div>
+  <section class="panel ref-panel">
+    <div class="panel-title-row">
+      <div><div class="panel-title">Referencia: Armas y Armaduras</div><span class="hint">Buscá y agregá equipo sin escribirlo manualmente.</span></div>
+      <span id="refCount" class="result-count"></span>
+    </div>
     <div class="ref-tabs" id="refTabs"></div>
-    <input class="ref-search" id="refSearch" placeholder="Buscar por nombre, habilidad, daño...">
+    <input class="ref-search" id="refSearch" placeholder="Buscar por nombre, habilidad, daño..." aria-label="Buscar en referencia de equipo">
     <div id="refTableContainer"></div>
+  </section>
+</main>
+
+<!-- Quick Guide -->
+<div class="modal-backdrop" id="guideModal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <button class="modal-close" onclick="closeGuide()" aria-label="Cerrar guía">×</button>
+    <h2 id="guideTitle">Guía rápida de GLERPS</h2>
+    <p>Creá tu personaje en unos pocos pasos. La hoja calcula automáticamente las características derivadas y los puntos cuando completás los datos necesarios.</p>
+    <ol class="guide-list">
+      <li><b>Identidad:</b> nombre, jugador y datos físicos.</li>
+      <li><b>Atributos:</b> cargá ST, DX, IQ y HT. HP, Will, Per y FP se derivan automáticamente.</li>
+      <li><b>Puntos:</b> indicá el presupuesto inicial y revisá cuánto gastaste y cuánto queda.</li>
+      <li><b>Ventajas / desventajas:</b> elegí el tipo para que la hoja las diferencie.</li>
+      <li><b>Skills:</b> agregá habilidad, nivel relativo y dificultad para calcular su coste.</li>
+      <li><b>Equipo:</b> usá la referencia para encontrar armas, armaduras y escudos rápidamente.</li>
+      <li><b>Guardar:</b> guardá cuando quieras; también existe recuperación automática de la sesión.</li>
+      <li><b>Atajos:</b> Ctrl/Cmd+S guardar, Ctrl/Cmd+Z deshacer, Ctrl/Cmd+Shift+Z rehacer.</li>
+    </ol>
+    <button class="primary wide" onclick="closeGuide()">Entendido</button>
+  </div>
+</div>
+
+<!-- Dice -->
+<div class="modal-backdrop" id="diceModal" hidden>
+  <div class="modal dice-modal" role="dialog" aria-modal="true" aria-labelledby="diceTitle">
+    <button class="modal-close" onclick="closeDice()" aria-label="Cerrar dados">×</button>
+    <h2 id="diceTitle">🎲 Dados</h2>
+    <div class="dice-controls">
+      <label>Cantidad<input id="diceCount" type="number" min="1" max="20" value="3"></label>
+      <label>Dado<select id="diceSides"><option value="4">d4</option><option value="6" selected>d6</option><option value="8">d8</option><option value="10">d10</option><option value="12">d12</option><option value="20">d20</option><option value="100">d100</option></select></label>
+      <label>Modificador<input id="diceModifier" type="number" value="0"></label>
+    </div>
+    <button class="primary wide" onclick="rollDice()">Tirar dados</button>
+    <div class="dice-result" id="diceResult">—</div>
+    <div class="dice-history"><strong>Historial</strong><div id="diceHistory">Todavía no hay tiradas.</div></div>
   </div>
 </div>
 

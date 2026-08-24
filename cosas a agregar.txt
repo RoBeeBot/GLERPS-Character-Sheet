@@ -1,0 +1,1542 @@
+- Mejor UI
+- regex o bloqueo de cosas
+- agregar placeholders
+- agregar una guia rapida de como funciona
+- idiomas o aclaraciones
+- app de dados
+- agregar total de puntos en cada cosa
+- agregar valores de cada punto por ejemplo de ST equivalente a los puntos totales
+- Orden alfabetico de cosas agregadas
+- agregarle filtros para mejor navegacion
+- boton de deshacer para volver atras
+- Se le puede poner categoria a las habilidades o desventajas para separalas de las demas o que tengan un color para diferenciarlas asi haciendolo mas intuitivo y no tener que escribir quirk: mi quirk, habilidad: mi habilidad
+
+
+
+==================================================
+
+# 40.5 UX, PRODUCT & USABILITY REQUIREMENTS
+
+==================================================
+
+Además de la arquitectura, dominio, reglas y testing definidos anteriormente, la aplicación debe tener una experiencia de usuario profesional.
+
+IMPORTANTE:
+
+Estas funcionalidades NO deben implementarse todas inmediatamente.
+
+Deben analizarse durante DISCOVERY y clasificarse como:
+
+* MVP
+* V1
+* FUTURE
+
+No implementar funcionalidades futuras antes de que sean necesarias.
+
+La UX debe construirse sobre el dominio y application layer existentes.
+
+La UI NO debe implementar reglas del sistema.
+
+==================================================
+
+# 40.5.1 UI / VISUAL DESIGN
+
+==================================================
+
+La interfaz debe ser:
+
+* clara;
+* moderna;
+* consistente;
+* intuitiva;
+* responsive;
+* accesible;
+* rápida;
+* visualmente jerárquica.
+
+Evitar interfaces que parezcan formularios administrativos genéricos.
+
+El usuario debe poder entender:
+
+* dónde está;
+* qué está editando;
+* cuánto lleva gastado;
+* qué errores tiene;
+* qué puede hacer;
+* qué debe hacer después.
+
+Utilizar componentes reutilizables y un sistema visual consistente.
+
+No crear estilos diferentes para cada feature sin una razón.
+
+==================================================
+
+# 40.5.2 CONTENT TYPES
+
+==================================================
+
+Los elementos del sistema deben diferenciarse visualmente por tipo.
+
+Ejemplos:
+
+* Advantage
+* Disadvantage
+* Skill
+* Weapon
+* Armor
+* Equipment
+* Hatsu
+* Creation
+* Quirk
+* Language
+* Cultural Familiarity
+
+No obligar al usuario a escribir manualmente:
+
+"Skill: My Skill"
+
+o:
+
+"Quirk: My Quirk"
+
+El sistema debe conocer el tipo del contenido.
+
+Ejemplo conceptual:
+
+Content:
+
+{
+type: "skill",
+category: "combat",
+name: "Broadsword"
+}
+
+La UI puede mostrar:
+
+[SKILL] Broadsword
+
+==================================================
+
+# 40.5.3 CATEGORIES
+
+==================================================
+
+Los contenidos pueden tener categorías.
+
+Ejemplos:
+
+Skills:
+
+* Combat
+* Social
+* Knowledge
+* Physical
+* Mental
+* Crafting
+* Survival
+
+Advantages:
+
+* Combat
+* Social
+* Physical
+* Mental
+* Supernatural
+
+Creations:
+
+* Creature
+* Weapon
+* Armor
+* Tool
+* Structure
+* Trap
+* Mobility
+* Support
+
+Las categorías deben ser datos/configuración siempre que sea posible.
+
+No hardcodear categorías dentro de componentes.
+
+==================================================
+
+# 40.5.4 TAG SYSTEM
+
+==================================================
+
+Implementar un sistema de tags extensible.
+
+Ejemplo:
+
+Broadsword:
+
+[SKILL] [COMBAT] [DX] [MELEE]
+
+Snake:
+
+[CREATION] [CREATURE] [SUPPORT]
+
+Combat Reflexes:
+
+[ADVANTAGE] [COMBAT]
+
+Los tags deben poder utilizarse para:
+
+* búsqueda;
+* filtrado;
+* agrupamiento;
+* ordenamiento;
+* visualización.
+
+Los tags NO deben reemplazar las categorías ni el content type.
+
+Separar conceptualmente:
+
+Content Type
+
+→ Category
+
+→ Tags
+
+==================================================
+
+# 40.5.5 SEARCH
+
+==================================================
+
+Implementar eventualmente una búsqueda global.
+
+Debe poder buscar:
+
+* nombre;
+* categoría;
+* tags;
+* atributo;
+* tipo de contenido;
+* descripción cuando corresponda.
+
+Ejemplos:
+
+"snake"
+
+"DX"
+
+"combat"
+
+"weapon"
+
+"blood"
+
+La búsqueda debe poder utilizarse dentro del builder.
+
+Considerar un shortcut:
+
+Ctrl + K
+
+o:
+
+Cmd + K
+
+La búsqueda debe ser extensible para soportar nuevos tipos de contenido.
+
+==================================================
+
+# 40.5.6 FILTERS
+
+==================================================
+
+Las listas grandes deben soportar filtros.
+
+Los filtros deben poder combinarse.
+
+Ejemplo:
+
+Skills:
+
+Attribute = DX
+
+Category = Combat
+
+Difficulty = Average
+
+Cost <= 10
+
+Los filtros deben ser declarativos cuando sea posible.
+
+No crear lógica específica de UI para cada catálogo.
+
+==================================================
+
+# 40.5.7 SORTING
+
+==================================================
+
+Las listas deben permitir ordenar cuando corresponda.
+
+Opciones posibles:
+
+* Alphabetical A → Z
+* Alphabetical Z → A
+* Cost ascending
+* Cost descending
+* Level ascending
+* Level descending
+* Recently added
+* Recently used
+* Category
+
+El orden por defecto debe ser coherente y documentado.
+
+==================================================
+
+# 40.5.8 FAVORITES
+
+==================================================
+
+Evaluar sistema de favoritos.
+
+El usuario podría marcar elementos como favoritos.
+
+Ejemplo:
+
+Favorites:
+
+* Broadsword
+* Combat Reflexes
+* Snake
+* Roots
+
+Los favoritos deben ser metadata del usuario y no alterar las reglas del contenido.
+
+==================================================
+
+# 40.5.9 RECENTLY USED
+
+==================================================
+
+Evaluar una sección:
+
+Recently Used
+
+para elementos utilizados recientemente.
+
+Esto será especialmente útil cuando el catálogo tenga cientos o miles de entradas.
+
+No duplicar contenido.
+
+Guardar únicamente referencias/IDs cuando sea posible.
+
+==================================================
+
+# 40.5.10 TOOLTIPS
+
+==================================================
+
+Los conceptos que puedan resultar ambiguos deben tener explicaciones contextuales.
+
+Ejemplo:
+
+Basic Speed
+[?]
+
+Tooltip:
+
+"Determines reaction speed and contributes to Dodge."
+
+No llenar la interfaz de texto explicativo innecesario.
+
+Utilizar:
+
+* tooltips;
+* popovers;
+* help panels;
+
+cuando sean apropiados.
+
+Los tooltips deben ser accesibles mediante teclado y no depender exclusivamente de hover.
+
+==================================================
+
+# 40.5.11 QUICK GUIDE
+
+==================================================
+
+Crear eventualmente una guía rápida para nuevos usuarios.
+
+Ejemplo:
+
+1. Define your character.
+2. Set attributes.
+3. Add advantages and disadvantages.
+4. Add skills.
+5. Configure equipment.
+6. Create your Hatsu.
+7. Add creations.
+8. Review your character.
+9. Save/export.
+
+La guía debe poder cerrarse.
+
+No mostrarla permanentemente si el usuario ya la completó.
+
+==================================================
+
+# 40.5.12 CONTEXTUAL HELP
+
+==================================================
+
+Agregar eventualmente un sistema de:
+
+"What is this?"
+
+o:
+
+"How does this work?"
+
+Especialmente para:
+
+* reglas complejas;
+* características derivadas;
+* Hatsu;
+* restrictions;
+* vows;
+* Soul Link;
+* Blood Ink;
+* point calculations.
+
+La explicación debe utilizar contenido original/parafraseado y no copiar material protegido.
+
+==================================================
+
+# 40.5.13 PLACEHOLDERS
+
+==================================================
+
+Los inputs deben tener placeholders útiles.
+
+Ejemplos:
+
+Character Name:
+
+"e.g. Kurapika"
+
+Player:
+
+"e.g. Franco"
+
+Description:
+
+"Describe your character..."
+
+Creation:
+
+"Describe what this creation does..."
+
+Los placeholders NO deben reemplazar labels.
+
+Los inputs siempre deben tener labels accesibles.
+
+==================================================
+
+# 40.5.14 INPUT VALIDATION
+
+==================================================
+
+Aplicar validación consistente.
+
+Validar:
+
+* tipos;
+* rangos;
+* longitudes;
+* formatos;
+* caracteres cuando corresponda;
+* valores numéricos;
+* IDs;
+* contenido estructurado.
+
+Utilizar:
+
+Schema validation
+
+*
+
+Domain validation
+
+*
+
+UI feedback.
+
+No depender exclusivamente de regex.
+
+Las regex deben utilizarse solamente cuando realmente solucionen un problema de formato.
+
+No bloquear caracteres arbitrariamente sin una razón funcional.
+
+==================================================
+
+# 40.5.15 INLINE EDITING
+
+==================================================
+
+Cuando sea apropiado, permitir editar información directamente.
+
+Ejemplo:
+
+Character Name
+
+[Specialist]
+
+en lugar de obligar siempre a abrir un modal.
+
+No sacrificar accesibilidad ni claridad.
+
+==================================================
+
+# 40.5.16 ADD ITEM PREVIEW
+
+==================================================
+
+Cuando agregar un elemento pueda tener consecuencias importantes, mostrar un preview.
+
+Ejemplo:
+
+Combat Reflexes
+
+Cost: 15 points
+
+Category: Combat
+
+Prerequisites: None
+
+Effects:
+...
+
+[Cancel]
+
+[Add]
+
+No utilizar confirmaciones innecesarias para acciones triviales.
+
+==================================================
+
+# 40.5.17 UNDO / REDO
+
+==================================================
+
+Implementar eventualmente un sistema consistente de:
+
+Undo
+
+Redo
+
+Debe estar basado en cambios de estado del Character Builder.
+
+No implementar Undo únicamente manipulando elementos visuales.
+
+Shortcuts:
+
+Ctrl + Z
+
+Ctrl + Shift + Z
+
+Cmd + Z
+
+Cmd + Shift + Z
+
+El sistema debe ser compatible con:
+
+* autosave;
+* versioning;
+* persistence.
+
+==================================================
+
+# 40.5.18 CHANGE HISTORY
+
+==================================================
+
+Preparar la arquitectura para historial de cambios.
+
+Ejemplo:
+
+03:42 — Added Snake
+
+03:41 — Increased DX 12 → 13
+
+03:40 — Added Combat Reflexes
+
+03:38 — Changed character name
+
+No es obligatorio implementar una UI completa inicialmente.
+
+El modelo no debe impedir agregar esta funcionalidad posteriormente.
+
+==================================================
+
+# 40.5.19 CHARACTER DUPLICATION
+
+==================================================
+
+Permitir eventualmente:
+
+Duplicate Character
+
+Ejemplo:
+
+Specialist v1
+
+↓
+
+Specialist v2
+
+El personaje duplicado debe ser independiente.
+
+Modificar uno no debe modificar el otro.
+
+==================================================
+
+# 40.5.20 TEMPLATES
+
+==================================================
+
+Preparar soporte para templates.
+
+Ejemplos:
+
+* Empty Character
+* Beginner
+* Combat Specialist
+* Nen User
+* Living Creations Specialist
+
+Un template debe ser una definición reutilizable.
+
+No acoplar templates a componentes específicos.
+
+==================================================
+
+# 40.5.21 CHARACTER STATES
+
+==================================================
+
+El builder debe representar claramente su estado.
+
+Ejemplos:
+
+✓ Valid
+
+⚠ Warnings
+
+✕ Errors
+
+● In Progress
+
+○ Incomplete
+
+Cada sección puede mostrar su propio estado.
+
+Ejemplo:
+
+Identity ✓
+
+Attributes ✓
+
+Advantages ⚠
+
+Skills ✓
+
+Hatsu ✕
+
+Creations ○
+
+El usuario debe poder navegar directamente hacia los problemas.
+
+==================================================
+
+# 40.5.22 PERSISTENCE FEEDBACK
+
+==================================================
+
+Como el sistema tendrá autosave, mostrar claramente el estado.
+
+Ejemplos:
+
+Saving...
+
+Saved
+
+Saved 5 seconds ago
+
+Save failed
+
+No generar falsa sensación de persistencia.
+
+Si un save falla:
+
+* informar al usuario;
+* mantener el estado local cuando sea posible;
+* permitir retry.
+
+==================================================
+
+# 40.5.23 SESSION RECOVERY
+
+==================================================
+
+Si el usuario vuelve a la aplicación y existe un personaje local no finalizado:
+
+mostrar:
+
+"We found an unfinished character."
+
+Opciones:
+
+Restore
+
+Discard
+
+La recuperación no debe sobrescribir silenciosamente un personaje existente.
+
+==================================================
+
+# 40.5.24 EXPLAINABLE CALCULATIONS
+
+==================================================
+
+El Rules Engine debe poder proporcionar información suficiente para explicar cálculos importantes.
+
+No devolver únicamente:
+
+value: 10
+
+Cuando sea útil devolver:
+
+value: 10
+
+breakdown:
+
+* base: 9
+* modifier: +1
+* source: Combat Reflexes
+
+Esto permitirá a la UI mostrar:
+
+Why is my Dodge 10?
+
+o:
+
+Why does this cost 20 points?
+
+El dominio debe seguir siendo independiente de la UI.
+
+==================================================
+
+# 40.5.25 POINT BREAKDOWN UI
+
+==================================================
+
+Mostrar claramente el coste de cada elemento.
+
+Ejemplo:
+
+ST 12
+
+Cost:
+
++20 points
+
+Y permitir eventualmente expandir:
+
+Base: 10
+
+Additional levels: +10
+
+Total: 20
+
+Lo mismo debe aplicarse a:
+
+* advantages;
+* disadvantages;
+* skills;
+* languages;
+* equipment;
+* other point-based systems.
+
+==================================================
+
+# 40.5.26 CHARACTER POINT SUMMARY
+
+==================================================
+
+El usuario debe poder ver permanentemente:
+
+Budget
+
+Spent
+
+Remaining
+
+Breakdown
+
+Ejemplo:
+
+POINTS
+
+250 Budget
+
+180 Spent
+
+70 Remaining
+
+BREAKDOWN
+
+Attributes       130
+
+Advantages        49
+
+Disadvantages    -40
+
+Skills             41
+
+Equipment           0
+
+Total             180
+
+La UI debe consumir el Point Calculation Engine.
+
+Nunca recalcular estos números directamente en componentes.
+
+==================================================
+
+# 40.5.27 MODIFIER BREAKDOWN
+
+==================================================
+
+Las características derivadas deben poder explicar sus modificadores.
+
+Ejemplo:
+
+Dodge: 10
+
+Base: 9
+
+Combat Reflexes: +1
+
+Other: +0
+
+Total: 10
+
+Esto es especialmente importante para debugging y para la confianza del usuario.
+
+==================================================
+
+# 40.5.28 DEPENDENCY NAVIGATION
+
+==================================================
+
+Cuando una regla falle debido a una dependencia:
+
+mostrar claramente cuál falta.
+
+Ejemplo:
+
+Skill cannot be added.
+
+Missing prerequisite:
+
+Broadsword 12+
+
+[Go to Skills]
+
+La UI debe permitir navegar directamente al lugar donde puede solucionarse el problema cuando sea posible.
+
+==================================================
+
+# 40.5.29 SMART VALIDATION
+
+==================================================
+
+La validación debe ejecutarse en tiempo razonable durante la edición.
+
+No esperar únicamente al submit.
+
+Diferenciar:
+
+ERROR
+
+WARNING
+
+INFO
+
+Ejemplo:
+
+ERROR:
+
+Character exceeds point budget.
+
+WARNING:
+
+Character has no equipment.
+
+INFO:
+
+Hatsu has no optional restrictions.
+
+Los warnings no deben bloquear un personaje salvo que una regla explícitamente los defina como bloqueantes.
+
+==================================================
+
+# 40.5.30 ERROR EXPLANATIONS
+
+==================================================
+
+Los errores deben ser accionables.
+
+Evitar:
+
+INVALID_SKILL
+
+POINT_ERROR
+
+RULE_FAILED
+
+Preferir:
+
+"Broadsword requires DX 10 or higher. Current DX: 9."
+
+Cuando sea posible incluir acciones:
+
+[Increase DX]
+
+[View Rule]
+
+[Remove Skill]
+
+Los códigos internos de error deben mantenerse separados del texto mostrado al usuario.
+
+==================================================
+
+# 40.5.31 KEYBOARD NAVIGATION
+
+==================================================
+
+La aplicación debe soportar navegación por teclado.
+
+Mínimo:
+
+Tab
+
+Shift + Tab
+
+Enter
+
+Escape
+
+Arrow keys cuando corresponda
+
+Shortcuts:
+
+Ctrl/Cmd + Z → Undo
+
+Ctrl/Cmd + Shift + Z → Redo
+
+Ctrl/Cmd + S → Save
+
+Ctrl/Cmd + K → Search
+
+No utilizar shortcuts que interfieran con shortcuts nativos importantes sin una razón clara.
+
+==================================================
+
+# 40.5.32 MOBILE / RESPONSIVE UX
+
+==================================================
+
+Diseñar explícitamente para:
+
+Desktop
+
+Tablet
+
+Mobile
+
+No limitarse a hacer que el layout desktop "encaje" en móvil.
+
+Desktop puede utilizar:
+
+Sidebar
+
+Builder
+
+Persistent Summary
+
+Mobile puede utilizar:
+
+Stepper
+
+Content
+
+Collapsible Summary
+
+Bottom actions
+
+Los controles principales deben permanecer accesibles.
+
+==================================================
+
+# 40.5.33 THEMING
+
+==================================================
+
+Preparar soporte para:
+
+Light Mode
+
+Dark Mode
+
+High Contrast
+
+La arquitectura visual no debe asumir un único tema.
+
+Temas especiales pueden implementarse posteriormente.
+
+==================================================
+
+# 40.5.34 REDUCED MOTION
+
+==================================================
+
+Las animaciones deben respetar:
+
+prefers-reduced-motion
+
+Cuando el usuario prefiera reducir movimiento:
+
+* reducir;
+* simplificar;
+* o desactivar animaciones no esenciales.
+
+==================================================
+
+# 40.5.35 INTEGRATED DICE TOOL
+
+==================================================
+
+Evaluar una herramienta de dados integrada.
+
+Debe soportar eventualmente:
+
+* dados configurables;
+* múltiples dados;
+* modificadores;
+* historial;
+* resultados;
+* shortcuts.
+
+Ejemplos:
+
+1d6
+
+2d6+1
+
+3d6
+
+La herramienta debe ser independiente del Character Rules Engine.
+
+Cuando tenga sentido puede utilizar datos del personaje.
+
+Ejemplo:
+
+DX Roll
+
+Skill Roll
+
+Damage Roll
+
+==================================================
+
+# 40.5.36 DICE HISTORY
+
+==================================================
+
+Si se implementa Dice Tool, guardar un historial temporal de tiradas.
+
+Ejemplo:
+
+3d6 → 11
+
+DX Roll → 9
+
+Damage 2d6+1 → 8
+
+No almacenar información innecesaria permanentemente.
+
+==================================================
+
+# 40.5.37 IMPORT / EXPORT
+
+==================================================
+
+Preparar soporte para:
+
+JSON
+
+PDF
+
+Printable Character Sheet
+
+No leer directamente desde el estado de React/Next.js.
+
+Exportar desde:
+
+Character Model
+
+Importar mediante:
+
+JSON
+
+↓
+
+Schema Validation
+
+↓
+
+Domain Validation
+
+↓
+
+Rules Engine
+
+↓
+
+Character
+
+Nunca confiar directamente en datos importados.
+
+==================================================
+
+# 40.5.38 SHARING
+
+==================================================
+
+Preparar eventualmente soporte para compartir personajes.
+
+Posibles mecanismos:
+
+* share URL;
+* share ID;
+* import/export code.
+
+Los personajes compartidos pueden tener:
+
+View Only
+
+Edit
+
+según permisos.
+
+No implementar autenticación completa únicamente para cumplir este punto.
+
+Preparar la arquitectura para ello.
+
+==================================================
+
+# 40.5.39 VIEW MODE / EDIT MODE
+
+==================================================
+
+Preparar dos modos:
+
+EDIT MODE
+
+El usuario puede modificar el personaje.
+
+VIEW MODE
+
+El usuario puede:
+
+* revisar estadísticas;
+* ver ventajas;
+* ver desventajas;
+* ver skills;
+* revisar Hatsu;
+* revisar Creaciones;
+* utilizar herramientas permitidas;
+
+pero no modificar el personaje.
+
+Esto será útil para personajes compartidos.
+
+==================================================
+
+# 40.5.40 NOTES
+
+==================================================
+
+Separar:
+
+System Data
+
+de:
+
+Player Notes
+
+Ejemplo:
+
+Snake
+
+System Description:
+
+"Living creature..."
+
+Player Notes:
+
+"Used primarily for scouting."
+
+Las notas del jugador no deben modificar las reglas salvo que exista una feature explícita que lo permita.
+
+==================================================
+
+# 40.5.41 INTERNATIONALIZATION
+
+==================================================
+
+Preparar internacionalización desde la arquitectura.
+
+Los textos de UI NO deben estar dispersos arbitrariamente por componentes.
+
+Preparar soporte para:
+
+Spanish
+
+English
+
+y futuros idiomas.
+
+Los IDs internos deben ser independientes del idioma.
+
+Ejemplo correcto:
+
+skill.id = "broadsword"
+
+No:
+
+skill.id = "espadon"
+
+Los nombres y descripciones localizables deben ser datos de contenido.
+
+Las reglas y mensajes de validación también deben poder localizarse.
+
+==================================================
+
+# 40.5.42 CONTENT / RULE SEPARATION
+
+==================================================
+
+Mantener estrictamente separados:
+
+Rules
+
+Content
+
+Localization
+
+User Data
+
+Ejemplo:
+
+Rule:
+
+"Skill cost is calculated according to difficulty and relative level."
+
+Content:
+
+"Broadsword"
+
+Localization:
+
+"Espada ancha"
+
+User Data:
+
+"Character has Broadsword at level X."
+
+Esto permitirá actualizar contenido o idiomas sin modificar las reglas.
+
+==================================================
+
+# 40.5.43 PLAYTEST MODE
+
+==================================================
+
+Preparar conceptualmente una futura funcionalidad:
+
+PLAYTEST MODE
+
+Permitiría registrar durante una partida:
+
+* dice rolls;
+* damage;
+* creation damage;
+* creation destruction;
+* Soul Backlash;
+* Blood Ink usage;
+* Hatsu activation;
+* restrictions;
+* vows;
+* combat events.
+
+No implementar inicialmente salvo que sea aprobado.
+
+Pero el diseño del dominio no debe impedir agregarlo posteriormente.
+
+==================================================
+
+# 40.5.44 RULE VERSIONING
+
+==================================================
+
+Los personajes deben poder asociarse eventualmente a una versión del sistema de reglas.
+
+Ejemplo:
+
+Character:
+
+version: 3
+
+rulesetVersion: 1.2
+
+Esto permitirá actualizar reglas sin romper personajes existentes.
+
+==================================================
+
+# 40.5.45 CHARACTER MIGRATIONS
+
+==================================================
+
+Preparar eventualmente un sistema de migración.
+
+Ejemplo:
+
+Character v1
+
+↓
+
+Migration v1 → v2
+
+↓
+
+Character v2
+
+Esto será necesario si el modelo o las reglas cambian significativamente.
+
+No implementar un sistema complejo de migraciones hasta que exista una necesidad real.
+
+==================================================
+
+# 40.5.46 RULE CHANGELOG
+
+==================================================
+
+Preparar documentación de cambios de reglas.
+
+Ejemplo:
+
+Rules v1.2
+
+* Updated Soul Link calculation.
+* Changed Blood Ink restriction.
+* Added new Creation type.
+
+Los cambios importantes deben quedar documentados.
+
+==================================================
+
+# 40.5.47 USER CONFIDENCE
+
+==================================================
+
+La interfaz debe comunicar claramente:
+
+* cuándo se guardaron los datos;
+* cuánto cuestan las cosas;
+* por qué algo cuesta determinada cantidad;
+* por qué algo es inválido;
+* qué regla está causando un problema;
+* qué falta para completar el personaje.
+
+La aplicación debe evitar estados ambiguos.
+
+El usuario nunca debería preguntarse:
+
+"¿Se guardó?"
+
+"¿Por qué cuesta esto?"
+
+"¿Por qué no puedo agregarlo?"
+
+"¿Qué está mal?"
+
+si la aplicación puede proporcionar esa información.
+
+==================================================
+
+# 40.5.48 PRODUCT PRINCIPLES
+
+==================================================
+
+Priorizar:
+
+1. Clarity
+2. Consistency
+3. Explainability
+4. Accessibility
+5. Discoverability
+6. Reliability
+7. Speed
+8. Visual polish
+
+No sacrificar arquitectura o correctness por efectos visuales.
+
+No implementar UX compleja si una solución más simple es claramente mejor.
+
+==================================================
+
+# 40.5.49 MVP PRIORITY
+
+==================================================
+
+Durante DISCOVERY, clasificar las funcionalidades anteriores.
+
+Recomendación inicial:
+
+MVP:
+
+* Clear UI
+* Responsive layout
+* Categories
+* Content Types
+* Tags
+* Search
+* Filters
+* Sorting
+* Placeholders
+* Tooltips
+* Point breakdown
+* Validation feedback
+* Section status
+* Autosave feedback
+* Undo/Redo
+* Keyboard navigation
+* Basic accessibility
+* Quick Guide
+
+V1:
+
+* Favorites
+* Recently Used
+* Change History
+* Character Duplication
+* Templates
+* View/Edit Mode
+* Import/Export
+* Dice Tool
+* Dice History
+* Explainable Calculations
+* Modifier Breakdown
+* Sharing preparation
+* Internationalization
+
+FUTURE:
+
+* Playtest Mode
+* Character Versioning UI
+* Rule Versioning UI
+* Character Migration System
+* Advanced Sharing
+* Full rules changelog
+* Advanced themes
+* Advanced analytics
+
+Esta clasificación es una recomendación inicial.
+
+Claude Code debe revisarla durante DISCOVERY y proponer cambios antes de implementarla.
+
+==================================================
+
+# 40.5.50 UX DEFINITION OF DONE
+
+==================================================
+
+Una feature de UX no se considera terminada simplemente porque "se ve bien".
+
+Debe verificarse:
+
+[ ] Happy path
+
+[ ] Empty state
+
+[ ] Loading state
+
+[ ] Error state
+
+[ ] Success state
+
+[ ] Mobile
+
+[ ] Desktop
+
+[ ] Keyboard
+
+[ ] Accessibility básica
+
+[ ] Screen reader considerations cuando corresponda
+
+[ ] No información crítica depende únicamente del color
+
+[ ] Feedback visual claro
+
+[ ] Feedback textual cuando sea necesario
+
+[ ] No pérdida de datos
+
+[ ] Undo/Recovery cuando corresponda
+
+[ ] Tests apropiados
+
+[ ] No lógica de dominio dentro de componentes
+
+[ ] No duplicación de reglas
+
+[ ] Documentación actualizada cuando corresponda
+
+==================================================
+
+# 40.5.51 IMPORTANT UX RULE
+
+==================================================
+
+NO convertir la aplicación en un formulario gigante.
+
+El Character Builder debe sentirse como una herramienta interactiva de construcción de personajes.
+
+El usuario debe poder:
+
+* explorar;
+* buscar;
+* filtrar;
+* comparar;
+* agregar;
+* modificar;
+* deshacer;
+* entender;
+* validar;
+* guardar;
+* revisar;
+
+sin perder contexto.
+
+La complejidad del sistema debe estar en el dominio y en el Rules Engine.
+
+La interfaz debe hacer esa complejidad comprensible.

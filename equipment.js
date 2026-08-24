@@ -39,6 +39,10 @@ const REF_CATEGORIES = [
 
 let currentRefCategory = 'armor';
 
+function escapeHTML(value){
+  return String(value ?? '').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
 function initEquipmentReference(){
   const tabsEl = document.getElementById('refTabs');
   tabsEl.innerHTML = '';
@@ -68,11 +72,14 @@ function renderRefTable(){
   const cat = REF_CATEGORIES.find(c=>c.id===currentRefCategory);
   const filter = (document.getElementById('refSearch').value || '').toLowerCase().trim();
   const container = document.getElementById('refTableContainer');
+  const countEl = document.getElementById('refCount');
 
-  const items = cat.data.filter(it=>{
+  const items = [...cat.data].sort((a,b)=>String(a.weapon||a.name).localeCompare(String(b.weapon||b.name),'es')).filter(it=>{
     if(!filter) return true;
     return JSON.stringify(it).toLowerCase().includes(filter);
   });
+
+  if(countEl) countEl.textContent = `${items.length} resultado${items.length===1?'':'s'}`;
 
   if(items.length === 0){
     container.innerHTML = '<div class="ref-empty">Sin resultados para esa búsqueda.</div>';
@@ -86,7 +93,7 @@ function renderRefTable(){
   items.forEach((it, idx)=>{
     const cells = cat.row(it);
     html += '<tr>';
-    cells.forEach(c=> html += `<td>${c}</td>`);
+    cells.forEach(c=> html += `<td>${escapeHTML(c)}</td>`);
     html += `<td><button type="button" class="add-btn" data-idx="${idx}">+ agregar</button></td>`;
     html += '</tr>';
   });
